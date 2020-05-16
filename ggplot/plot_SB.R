@@ -9,7 +9,6 @@ library(RCurl)
 
 font_SB <- ifelse(length(grep('HP Simplified',fonts()))>0,'HP Simplified','Bahnschrift')
 
-
 brand_plot <- function(orig_plot, save_name, asp = 1, base_size = 5, data_home = '', fade_borders = '', axis_rot = F) {
   logo_size <- 0.06
   
@@ -77,7 +76,7 @@ brand_plot <- function(orig_plot, save_name, asp = 1, base_size = 5, data_home =
 theme_SB <- theme_bw() +
   theme(
     line = element_line(lineend='round', color='darkblue'),
-    text = element_text(family='HP Simplified', color='darkblue'),
+    text = element_text(family=font_SB, color='darkblue'),
     plot.background = element_rect(fill = 'grey95', color = 'transparent'),
     panel.border = element_rect(color = 'darkblue'),
     axis.ticks = element_line(color='darkblue', size = 0.4),
