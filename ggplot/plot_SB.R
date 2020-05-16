@@ -7,6 +7,9 @@ library(colorspace)
 library(extrafont)
 
 
+font_SB <- ifelse(length(grep('HP Simplified',fonts()))>0,'HP Simplified','Bahnschrift')
+
+
 brand_plot <- function(orig_plot, save_name, asp = 1, base_size = 5, data_home = '', fade_borders = '', axis_rot = F) {
   logo_size <- 0.06
   
@@ -21,10 +24,10 @@ brand_plot <- function(orig_plot, save_name, asp = 1, base_size = 5, data_home =
   }
   
   ## local logo to read in
-  logo_file <- readPNG('C:/Users/rei1740/Desktop/Anthony/statbutler.png')
+  logo_file <- readPNG('https://github.com/ajreinhard/data-viz/raw/master/ggplot/statbutler.png')
 
-  author_txt <- textGrob('By Anthony Reinhard', x=unit(0.08 * (base_size_rat_wid), 'npc'), gp=gpar(col='darkblue', fontfamily='Bahnschrift', fontsize=6), hjust=0)
-  data_txt <- textGrob(data_home, x=unit(1 - (.01 * (base_size_rat_wid)), 'npc'), gp=gpar(col='grey95', fontfamily='Bahnschrift', fontsize=6), hjust=1)
+  author_txt <- textGrob('By Anthony Reinhard', x=unit(0.08 * (base_size_rat_wid), 'npc'), gp=gpar(col='darkblue', fontfamily=font_SB, fontsize=6), hjust=0)
+  data_txt <- textGrob(data_home, x=unit(1 - (.01 * (base_size_rat_wid)), 'npc'), gp=gpar(col='grey95', fontfamily=font_SB, fontsize=6), hjust=1)
   footer_bg <- grid.rect(x = unit(seq(0.5,1.5,length=1000), 'npc'), gp=gpar(col = 'transparent', fill = colorRampPalette(c('grey95', 'darkblue'), space = 'rgb')(1000)), draw = F)
   footer <- grobTree(footer_bg, author_txt, data_txt)
 
@@ -151,6 +154,7 @@ axis_limits_y <- function(p) {
 }
 
 color_SB <- c("#ff7f00", "#9932cc", "#8cff72", "#00008b", "#51dbd8", "#674b00", "#ff66cf", "#8f8f8f", "#ff0000", "#e1ed00", "#0b5209", "#636363")
+
 NFL_pri <- c('ARI'='#97233f',
 'ATL'='#a71930',
 'BAL'='#241773',
@@ -217,6 +221,3 @@ NFL_sec <- c('ARI'='#000000',
 'TB'='#34302b',
 'TEN'='#4b92db',
 'WAS'='#ffb612')
-
-
-
