@@ -71,23 +71,23 @@ brand_plot <- function(orig_plot, save_name, asp = 1, base_size = 5, data_home =
 }
 
 
-
-
-theme_SB <- theme_bw() +
-  theme(
-    line = element_line(lineend='round', color='darkblue'),
-    text = element_text(family=font_SB, color='darkblue'),
-    plot.background = element_rect(fill = 'grey95', color = 'transparent'),
-    panel.border = element_rect(color = 'darkblue'),
-    axis.ticks = element_line(color='darkblue', size = 0.4),
-    axis.title = element_text(size = 10),
-    axis.text = element_text(size = 8, color = 'darkblue'),
-    plot.title = element_text(size = 14),
-    plot.subtitle = element_text(size = 8),
-    plot.caption = element_text(size = 5),
-    legend.background = element_rect(fill = 'grey90', color = 'darkblue'),
-    legend.key = element_blank()
-  ) 
+theme_SB <-  theme(
+  line = element_line(lineend = 'round', color='darkblue'),
+  text = element_text(family = font_SB, color='darkblue'),
+  plot.background = element_rect(fill = 'grey95', color = 'transparent'),
+  panel.border = element_rect(color = 'darkblue', fill = NA),
+  panel.background = element_rect(fill = 'white', color = 'transparent'),
+  axis.ticks = element_line(color = 'darkblue', size = 0.3),
+  axis.title = element_text(size = 10),
+  axis.text = element_text(size = 8, color = 'darkblue'),
+  plot.title = element_text(size = 14),
+  plot.subtitle = element_text(size = 8),
+  plot.caption = element_text(size = 5),
+  legend.background = element_rect(fill = 'grey90', color = 'darkblue'),
+  legend.key = element_blank(),
+  panel.grid.minor = element_blank(),
+  panel.grid.major = element_line(color='grey70', size = 0.3)
+) 
 
 
 properLims <- function(vec) {
@@ -180,6 +180,7 @@ NFL_pri <- c('ARI'='#97233f',
 'NYG'='#0b2265',
 'NYJ'='#125740',
 'OAK'='#a5acaf',
+'LV'='#a5acaf',
 'PHI'='#004953',
 'PIT'='#000000',
 'SF'='#aa0000',
@@ -214,6 +215,7 @@ NFL_sec <- c('ARI'='#000000',
 'NYG'='#a71930',
 'NYJ'='#000000',
 'OAK'='#000000',
+'LV'='#000000',
 'PHI'='#a5acaf',
 'PIT'='#ffb612',
 'SF'='#b3995d',
