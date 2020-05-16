@@ -5,7 +5,7 @@ library(png)
 library(cowplot)
 library(colorspace)
 library(extrafont)
-
+library(RCurl)
 
 font_SB <- ifelse(length(grep('HP Simplified',fonts()))>0,'HP Simplified','Bahnschrift')
 
@@ -23,9 +23,10 @@ brand_plot <- function(orig_plot, save_name, asp = 1, base_size = 5, data_home =
     logo_size <- (5/base_size) * logo_size
   }
   
+  
   ## local logo to read in
-  logo_file <- readPNG('https://github.com/ajreinhard/data-viz/raw/master/ggplot/statbutler.png')
-
+  logo_file <- readPNG(getURLContent('https://raw.githubusercontent.com/ajreinhard/data-viz/master/ggplot/statbutler.png'))
+  
   author_txt <- textGrob('By Anthony Reinhard', x=unit(0.08 * (base_size_rat_wid), 'npc'), gp=gpar(col='darkblue', fontfamily=font_SB, fontsize=6), hjust=0)
   data_txt <- textGrob(data_home, x=unit(1 - (.01 * (base_size_rat_wid)), 'npc'), gp=gpar(col='grey95', fontfamily=font_SB, fontsize=6), hjust=1)
   footer_bg <- grid.rect(x = unit(seq(0.5,1.5,length=1000), 'npc'), gp=gpar(col = 'transparent', fill = colorRampPalette(c('grey95', 'darkblue'), space = 'rgb')(1000)), draw = F)
