@@ -9,6 +9,9 @@ library(RCurl)
 
 font_SB <- ifelse(length(grep('HP Simplified',fonts()))>0,'HP Simplified','Bahnschrift')
 
+wordmark_url = function(x) ifelse(is.na(x),NA,paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/wordmark/',x,'.png'))
+ESPN_logo_url = function(x) ifelse(is.na(x),NA,paste0('https://a.espncdn.com/i/teamlogos/nfl/500/',x,'.png'))
+
 brand_plot <- function(orig_plot, save_name, asp = 1, base_size = 5, data_home = '', fade_borders = '', axis_rot = F) {
   logo_size <- 0.06
   
