@@ -12,7 +12,7 @@ font_SB <- ifelse(length(grep('HP Simplified',fonts()))>0,'HP Simplified','Bahns
 wordmark_url = function(x) ifelse(is.na(x),NA,paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/wordmark/',x,'.png'))
 ESPN_logo_url = function(x) ifelse(is.na(x),NA,paste0('https://a.espncdn.com/i/teamlogos/nfl/500/',x,'.png'))
 
-brand_plot <- function(orig_plot, save_name, asp = 1, base_size = 5, data_home = '', fade_borders = '', axis_rot = F) {
+brand_plot <- function(orig_plot, save_name, asp = 1, base_size = 5, data_home = '', fade_borders = '', fade_prop = 0.5, axis_rot = F) {
   logo_size <- 0.06
   
   ## is image taller than wider? if so, make sure the width is at least the base_size
@@ -24,8 +24,7 @@ brand_plot <- function(orig_plot, save_name, asp = 1, base_size = 5, data_home =
     base_size_rat_wid <- (5/base_size) / asp
     logo_size <- (5/base_size) * logo_size
   }
-  
-  
+   
   ## local logo to read in
   logo_file <- readPNG(getURLContent('https://raw.githubusercontent.com/ajreinhard/data-viz/master/ggplot/statbutler.png'))
   
@@ -38,8 +37,8 @@ brand_plot <- function(orig_plot, save_name, asp = 1, base_size = 5, data_home =
 
   if (fade_borders!='') {
     ## set up bounds for fade plot
-    x_lim <- axis_limits_x(orig_plot)
-    y_lim <- axis_limits_y(orig_plot)
+    x_lim <- axis_limits_x(orig_plot) * fade_prop + ggplot_build(orig_plot)$layout$panel_parms[[1]]$x.range * (1-fade_prop)
+    y_lim <- axis_limits_y(orig_plot) * fade_prop + ggplot_build(orig_plot)$layout$panel_parms[[1]]$y.range * (1-fade_prop)
     
     ## figure out which sides to fade
     border_layers <- c()
@@ -80,9 +79,9 @@ theme_SB <-  theme(
   plot.background = element_rect(fill = 'grey95', color = 'transparent'),
   panel.border = element_rect(color = 'darkblue', fill = NA),
   panel.background = element_rect(fill = 'white', color = 'transparent'),
-  axis.ticks = element_line(color = 'darkblue', size = 0.3),
-  axis.title = element_text(size = 10),
-  axis.text = element_text(size = 8, color = 'darkblue'),
+  axis.ticks = element_line(color = 'darkblue', size = 0.25),
+  axis.title = element_text(size = 8),
+  axis.text = element_text(size = 7, color = 'darkblue'),
   plot.title = element_text(size = 14),
   plot.subtitle = element_text(size = 8),
   plot.caption = element_text(size = 5),
