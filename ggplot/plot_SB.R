@@ -37,8 +37,8 @@ brand_plot <- function(orig_plot, save_name, asp = 1, base_size = 5, data_home =
 
   if (fade_borders!='') {
     ## set up bounds for fade plot
-    x_lim <- axis_limits_x(orig_plot) * fade_prop + ggplot_build(orig_plot)$layout$panel_parms[[1]]$x.range * (1-fade_prop)
-    y_lim <- axis_limits_y(orig_plot) * fade_prop + ggplot_build(orig_plot)$layout$panel_parms[[1]]$y.range * (1-fade_prop)
+    x_lim <- axis_limits_x(orig_plot) * fade_prop + ggplot_build(orig_plot)$layout$panel_params[[1]]$x.range * (1-fade_prop)
+    y_lim <- axis_limits_y(orig_plot) * fade_prop + ggplot_build(orig_plot)$layout$panel_params[[1]]$y.range * (1-fade_prop)
     
     ## figure out which sides to fade
     border_layers <- c()
