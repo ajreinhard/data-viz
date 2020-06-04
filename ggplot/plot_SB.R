@@ -6,6 +6,12 @@ library(cowplot)
 library(colorspace)
 library(extrafont)
 library(RCurl)
+library(ggpmisc)
+library(magick)
+library(ggimage)
+library(shadowtext)
+library(ggrepel)
+library(scales)
 
 font_SB <- ifelse(length(grep('HP Simplified',fonts()))>0,'HP Simplified','Bahnschrift')
 
@@ -39,6 +45,11 @@ brand_plot <- function(orig_plot, save_name, asp = 1, base_size = 5, data_home =
     ## set up bounds for fade plot
     x_lim <- axis_limits_x(orig_plot) * fade_prop + ggplot_build(orig_plot)$layout$panel_params[[1]]$x.range * (1-fade_prop)
     y_lim <- axis_limits_y(orig_plot) * fade_prop + ggplot_build(orig_plot)$layout$panel_params[[1]]$y.range * (1-fade_prop)
+    
+    if (axis_rot) {
+      x_lim <- axis_limits_x(orig_plot) * fade_prop + ggplot_build(orig_plot)$layout$panel_params[[1]]$y.range * (1-fade_prop)
+      y_lim <- axis_limits_y(orig_plot) * fade_prop + ggplot_build(orig_plot)$layout$panel_params[[1]]$x.range * (1-fade_prop)
+    }
     
     ## figure out which sides to fade
     border_layers <- c()
@@ -88,9 +99,11 @@ theme_SB <-  theme(
   legend.background = element_rect(fill = 'grey90', color = 'darkblue'),
   legend.key = element_blank(),
   panel.grid.minor = element_blank(),
-  panel.grid.major = element_line(color='grey70', size = 0.3)
+  panel.grid.major = element_line(color='grey70', size = 0.3),
+  axis.title.y = element_text(angle = 0, vjust = 0.5),
+  strip.background = element_blank(),
+  strip.text = element_text(size = 6, color = 'darkblue', family='Bahnschrift'),
 ) 
-
 
 properLims <- function(vec) {
   labs <- labeling::extended(min(vec, na.rm = T), max(vec, na.rm = T), m = 5)
@@ -107,8 +120,6 @@ properLimsRev <- function(vec) {
   plot_min <- ifelse(labs[1] > min(vec, na.rm = T), labs[1] - gap, labs[1])
   return(c(plot_max,plot_min))
 } 
-
-
 
 make_gradient <- function(deg, n = 500, col = 'grey95', corner = F) {
   rad <- deg / (180 / pi)
@@ -153,6 +164,18 @@ axis_limits_y <- function(p) {
   } else {
     return(ggplot_build(p)$layout$panel_scales_y[[1]]$range$range)
   }
+}
+
+
+grob_img_adj <- function(img_url, alpha = 0, whitewash = 0) {
+  return(lapply(img_url, function(x) {
+    img <- image_read(x)[[1]]
+    img[1,,] <- as.raw(255 - (255 - as.integer(img[1,,])) * (1-whitewash))
+    img[2,,] <- as.raw(255 - (255 - as.integer(img[2,,])) * (1-whitewash))
+    img[3,,] <- as.raw(255 - (255 - as.integer(img[3,,])) * (1-whitewash))
+    img[4,,] <- as.raw(as.integer(img[4,,]) * (1-alpha))
+    return(grid::rasterGrob(image = image_read(img)))
+  }))
 }
 
 color_SB <- c("#ff7f00", "#9932cc", "#8cff72", "#00008b", "#51dbd8", "#674b00", "#ff66cf", "#8f8f8f", "#ff0000", "#e1ed00", "#0b5209", "#636363")
