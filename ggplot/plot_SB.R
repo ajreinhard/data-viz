@@ -12,12 +12,19 @@ library(ggimage)
 library(shadowtext)
 library(ggrepel)
 library(scales)
+library(magrittr)
+library(tidyverse)
+library(gganimate)
 
+# decide what font I should use based on what is available on computer
 font_SB <- ifelse(length(grep('HP Simplified',fonts()))>0,'HP Simplified','Bahnschrift')
 
+# functions to retrieve images
 wordmark_url = function(x) ifelse(is.na(x),NA,paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/wordmark/',x,'.png'))
+helmet_url = function(x) ifelse(is.na(x),NA,paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/helmet_left/',x,'.png'))
 ESPN_logo_url = function(x) ifelse(is.na(x),NA,paste0('https://a.espncdn.com/i/teamlogos/nfl/500/',x,'.png'))
 
+# main function to save my branded plots
 brand_plot <- function(orig_plot, save_name, asp = 1, base_size = 5, data_home = '', fade_borders = '', fade_prop = 0.5, axis_rot = F) {
   logo_size <- 0.06
   
@@ -30,7 +37,7 @@ brand_plot <- function(orig_plot, save_name, asp = 1, base_size = 5, data_home =
     base_size_rat_wid <- (5/base_size) / asp
     logo_size <- (5/base_size) * logo_size
   }
-   
+  
   ## local logo to read in
   logo_file <- readPNG(getURLContent('https://raw.githubusercontent.com/ajreinhard/data-viz/master/ggplot/statbutler.png'))
   
@@ -83,7 +90,7 @@ brand_plot <- function(orig_plot, save_name, asp = 1, base_size = 5, data_home =
   ggsave(save_name, plt, dpi = 700, height = base_size, width = base_size * (asp))
 }
 
-
+# main StatButler theme
 theme_SB <-  theme(
   line = element_line(lineend = 'round', color='darkblue'),
   text = element_text(family = font_SB, color='darkblue'),
@@ -102,9 +109,32 @@ theme_SB <-  theme(
   panel.grid.major = element_line(color='grey70', size = 0.3),
   axis.title.y = element_text(angle = 0, vjust = 0.5),
   strip.background = element_blank(),
-  strip.text = element_text(size = 6, color = 'darkblue', family='Bahnschrift'),
+  strip.text = element_text(size = 6, color = 'darkblue', family = font_SB),
 ) 
 
+vid_theme_SB <-  theme(
+  line = element_line(lineend = 'round', color='darkblue'),
+  text = element_text(family = font_SB, color='darkblue'),
+  plot.background = element_rect(fill = 'grey95', color = 'transparent'),
+  panel.border = element_rect(color = 'darkblue', fill = NA),
+  panel.background = element_rect(fill = 'white', color = 'transparent'),
+  axis.ticks = element_line(color = 'darkblue', size = 0.75),
+  axis.title = element_text(size = 24),
+  axis.text = element_text(size = 21, color = 'darkblue'),
+  plot.title = element_text(size = 42),
+  plot.subtitle = element_text(size = 24),
+  plot.caption = element_text(size = 15),
+  legend.background = element_rect(fill = 'grey90', color = 'darkblue'),
+  legend.key = element_blank(),
+  panel.grid.minor = element_blank(),
+  panel.grid.major = element_line(color='grey70', size = 0.9),
+  axis.title.y = element_text(angle = 0, vjust = 0.5),
+  strip.background = element_blank(),
+  strip.text = element_text(size = 18, color = 'darkblue', family = font_SB)
+)
+  
+
+# function to set rounded plot limits
 properLims <- function(vec) {
   labs <- labeling::extended(min(vec, na.rm = T), max(vec, na.rm = T), m = 5)
   gap <- diff(labs[1:2])
@@ -113,6 +143,7 @@ properLims <- function(vec) {
   return(c(plot_min,plot_max))
 } 
 
+# function to set rounded plot limits if scale_x_reverse is used
 properLimsRev <- function(vec) {
   labs <- labeling::extended(min(vec, na.rm = T), max(vec, na.rm = T), m = 5)
   gap <- diff(labs[1:2])
@@ -121,6 +152,7 @@ properLimsRev <- function(vec) {
   return(c(plot_max,plot_min))
 } 
 
+# makes a gradient if I want to fade plot borders
 make_gradient <- function(deg, n = 500, col = 'grey95', corner = F) {
   rad <- deg / (180 / pi)
   mat <- matrix(
@@ -146,6 +178,7 @@ make_gradient <- function(deg, n = 500, col = 'grey95', corner = F) {
   )
 }
 
+# gets the limits of the x axis from a plot
 axis_limits_x <- function(p) {
   if (!is.null(ggplot_build(p)$layout$coord$limits$x)) {
     return(ggplot_build(p)$layout$coord$limits$x)
@@ -156,6 +189,7 @@ axis_limits_x <- function(p) {
   }
 }
 
+# gets the limits of the y axis from a plot
 axis_limits_y <- function(p) {
   if (!is.null(ggplot_build(p)$layout$coord$limits$y)) {
     return(ggplot_build(p)$layout$coord$limits$y)
@@ -166,7 +200,7 @@ axis_limits_y <- function(p) {
   }
 }
 
-
+# reads in an image as a grob and allows for some image alterations
 grob_img_adj <- function(img_url, alpha = 0, whitewash = 0) {
   return(lapply(img_url, function(x) {
     img <- image_read(x)[[1]]
@@ -177,6 +211,89 @@ grob_img_adj <- function(img_url, alpha = 0, whitewash = 0) {
     return(grid::rasterGrob(image = image_read(img)))
   }))
 }
+
+
+# used to create branded videos
+Scene2 <- ggproto(
+  "Scene2",
+  gganimate:::Scene,
+  plot_frame = function(self, plot, i, newpage = is.null(vp), vp = NULL, widths = NULL, heights = NULL, ...) {
+    plot <- self$get_frame(plot, i)
+    plot <- ggplot_gtable(plot)
+    
+    # insert changes here
+    logo_file <- readPNG(getURLContent('https://raw.githubusercontent.com/ajreinhard/data-viz/master/ggplot/statbutler.png'))
+    
+    author_txt <- textGrob('By Anthony Reinhard', x=unit(0.065, 'npc'), gp=gpar(col='darkblue', fontfamily=font_SB, fontsize=18), hjust=0)
+    data_txt <- textGrob(self$data_home, x=unit(1 - (.01), 'npc'), gp=gpar(col='grey95', fontfamily=font_SB, fontsize=18), hjust=1)
+    footer_bg <- grid.rect(x = unit(seq(0.5,1.5,length=1000), 'npc'), gp=gpar(col = 'transparent', fill = colorRampPalette(c('grey95', 'darkblue'), space = 'rgb')(1000)), draw = F)
+    footer <- grobTree(footer_bg, author_txt, data_txt)
+    
+    plt.final <- grid.arrange(plot, footer, heights=unit(c(1, 36), c('null','pt')))
+    plot <- ggdraw(plt.final) + draw_image(logo_file, x = 0.002, y = 0, hjust = 0, vjust = 0, height = 0.08, width = 0.1067 * (9/16))
+    
+    if (!is.null(widths)) plot$widths <- widths
+    if (!is.null(heights)) plot$heights <- heights
+    if (newpage) grid.newpage()
+    grDevices::recordGraphics(
+      requireNamespace("gganimate", quietly = TRUE),
+      list(),
+      getNamespace("gganimate")
+    )
+    if (is.null(vp)) {
+      grid.draw(plot)
+    } else {
+      if (is.character(vp)) seekViewport(vp)
+      else pushViewport(vp)
+      grid.draw(plot)
+      upViewport()
+    }
+    invisible(NULL)
+  }
+)
+
+Scene2$data_home <- NULL
+
+### the next four functions will simply duplicate existing nested gganimate functions and replace them with my personalized Scene2 function
+# used to create branded videos
+create_scene2 <- function(transition, view, shadow, ease, transmuters, nframes, data_home) {
+  if (is.null(nframes)) nframes <- 100
+  ggproto(NULL, Scene2, transition = transition, 
+          view = view, shadow = shadow, ease = ease, 
+          transmuters = transmuters, nframes = nframes,
+          data_home = data_home)
+}
+
+# used to create branded videos
+ggplot_build2 <- gganimate:::ggplot_build.gganim
+formals(ggplot_build2) <- c(formals(ggplot_build2), alist(data_home = ))
+body(ggplot_build2) <- body(ggplot_build2) %>%
+  as.list() %>%
+  inset2(4,
+         quote(scene <- create_scene2(plot$transition, plot$view, plot$shadow, 
+                                      plot$ease, plot$transmuters, plot$nframes, data_home))) %>%
+  as.call()
+
+
+# used to create branded videos
+prerender2 <- gganimate:::prerender
+formals(prerender2) <- c(formals(prerender2), alist(data_home = ))
+body(prerender2) <- body(prerender2) %>%
+  as.list() %>%
+  inset2(3,
+         quote(ggplot_build2(plot, data_home))) %>%
+  as.call()
+
+
+# used to create branded videos
+animate_SB <- gganimate:::animate.gganim
+formals(animate_SB) <- c(formals(animate_SB)[-length(formals(animate_SB))], alist(data_home = ''), formals(animate_SB)[length(formals(animate_SB))])
+body(animate_SB) <- body(animate_SB) %>%
+  as.list() %>%
+  inset2(8,
+         quote(plot <- prerender2(plot, nframes_total, data_home))) %>%
+  as.call()
+
 
 color_SB <- c("#ff7f00", "#9932cc", "#8cff72", "#00008b", "#51dbd8", "#674b00", "#ff66cf", "#8f8f8f", "#ff0000", "#e1ed00", "#0b5209", "#636363")
 
