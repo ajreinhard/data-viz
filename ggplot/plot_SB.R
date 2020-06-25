@@ -22,7 +22,7 @@ font_SB <- ifelse(length(grep('HP Simplified',fonts()))>0,'HP Simplified','Bahns
 # functions to retrieve images
 wordmark_url = function(x) ifelse(is.na(x),NA,paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/wordmark/',x,'.png'))
 helmet_url = function(x) ifelse(is.na(x),NA,paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/helmet_left/',x,'.png'))
-ESPN_logo_url = function(x) ifelse(is.na(x),NA,paste0('https://a.espncdn.com/i/teamlogos/nfl/500/',x,'.png'))
+ESPN_logo_url = function(x) ifelse(is.na(x),NA,ifelse(x %in% c('WAS','KC'),paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/ggplot/',x,'.png'),paste0('https://a.espncdn.com/i/teamlogos/nfl/500/',x,'.png')))
 
 # main function to save my branded plots
 brand_plot <- function(orig_plot, save_name, asp = 1, base_size = 5, data_home = '', fade_borders = '', fade_prop = 0.5, axis_rot = F) {
@@ -325,8 +325,10 @@ NFL_pri <- c('ARI'='#97233f',
 'LV'='#a5acaf',
 'PHI'='#004953',
 'PIT'='#000000',
+'SD'='#002244',	     	     
 'SF'='#aa0000',
 'SEA'='#002244',
+'STL'='#002244',
 'TB'='#d50a0a',
 'TEN'='#002244',
 'WAS'='#773141')
@@ -360,8 +362,10 @@ NFL_sec <- c('ARI'='#000000',
 'LV'='#000000',
 'PHI'='#a5acaf',
 'PIT'='#ffb612',
+'SD'='#0073cf',
 'SF'='#b3995d',
 'SEA'='#69be28',
+'STL'='#b3995d',
 'TB'='#34302b',
 'TEN'='#4b92db',
 'WAS'='#ffb612')
