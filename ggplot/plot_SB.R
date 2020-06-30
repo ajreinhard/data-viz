@@ -97,7 +97,7 @@ theme_SB <-  theme(
   plot.background = element_rect(fill = 'grey95', color = 'transparent'),
   panel.border = element_rect(color = 'darkblue', fill = NA),
   panel.background = element_rect(fill = 'white', color = 'transparent'),
-  axis.ticks = element_line(color = 'darkblue', size = 0.25),
+  axis.ticks = element_line(color = 'darkblue', size = 0.5),
   axis.title = element_text(size = 8),
   axis.text = element_text(size = 7, color = 'darkblue'),
   plot.title = element_text(size = 14),
@@ -112,13 +112,14 @@ theme_SB <-  theme(
   strip.text = element_text(size = 6, color = 'darkblue', family = font_SB),
 ) 
 
+# StatButler theme for animations
 vid_theme_SB <-  theme(
   line = element_line(lineend = 'round', color='darkblue'),
   text = element_text(family = font_SB, color='darkblue'),
   plot.background = element_rect(fill = 'grey95', color = 'transparent'),
   panel.border = element_rect(color = 'darkblue', fill = NA),
   panel.background = element_rect(fill = 'white', color = 'transparent'),
-  axis.ticks = element_line(color = 'darkblue', size = 0.75),
+  axis.ticks = element_line(color = 'darkblue', size = 1.5),
   axis.title = element_text(size = 24),
   axis.text = element_text(size = 21, color = 'darkblue'),
   plot.title = element_text(size = 42),
@@ -336,7 +337,7 @@ NFL_pri <- c('ARI'='#97233f',
 
 NFL_sec <- c('ARI'='#000000',
 'ATL'='#000000',
-'BAL'='#000000',
+'BAL'='#9e7c0c',
 'BUF'='#c60c30',
 'CAR'='#000000',
 'CHI'='#c83803',
