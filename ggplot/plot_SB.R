@@ -24,8 +24,32 @@ wordmark_url = function(x) ifelse(is.na(x),NA,paste0('https://raw.githubusercont
 helmet_url = function(x) ifelse(is.na(x),NA,paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/helmet_left/',x,'.png'))
 ESPN_logo_url = function(x) ifelse(is.na(x),NA,ifelse(x %in% c('WAS','KC'),paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/alt-logo/',x,'.png'),paste0('https://a.espncdn.com/i/teamlogos/nfl/500/',x,'.png')))
 
+# my prefered team order for facets
+.tm_div_order <- c('BUF', 'MIA', 'NE', 'NYJ', 'BAL', 'CIN', 'CLE', 'PIT', 'HOU', 'IND', 'JAX', 'TEN', 'DEN', 'KC', 'LAC', 'LV', 'DAL', 'NYG', 'PHI', 'WAS', 'CHI', 'DET', 'GB', 'MIN', 'ATL', 'CAR', 'NO', 'TB', 'ARI', 'LA', 'SF', 'SEA')
+.tm_div_order_alt <- c('BUF', 'MIA', 'NE', 'NYJ', 'DAL', 'NYG', 'PHI', 'WAS', 'BAL', 'CIN', 'CLE', 'PIT', 'CHI', 'DET', 'GB', 'MIN', 'HOU', 'IND', 'JAX', 'TEN', 'ATL', 'CAR', 'NO', 'TB', 'DEN', 'KC', 'LAC', 'LV', 'ARI', 'LA', 'SEA', 'SF')
+
 # main function to save my branded plots
-brand_plot <- function(orig_plot, save_name, asp = 1, base_size = 5, data_home = '', fade_borders = '', fade_prop = 0.5, axis_rot = F) {
+brand_plot <- function(orig_plot, save_name, asp = 1, base_size = 5, data_home = '', fade_borders = '', fade_prop = 0.5, axis_rot = F, tm_wordmarks = F) {
+	
+  ## start by adding team wordmarks
+  if (tm_wordmarks) {
+    orig_plot_bld <- ggplot_gtable(ggplot_build(orig_plot))
+    grob_strip_index <- which(sapply(orig_plot_bld$grob, function(x) x$name)=='strip')
+    facet_id <- sapply(grob_strip_index, function(grb) {
+      orig_plot_bld$grobs[[grb]]$grobs[[1]]$children[[2]]$children[[1]]$label
+    })
+    
+    orig_plot_bld$layout$z[grob_strip_index] <- 0
+    
+    for (i in 1:length(facet_id)) {
+      team_wd <- rasterGrob(image = image_read(wordmark_url(facet_id[i])), vp = viewport(height = .8, width = .6))
+      tot_tree <- grobTree(team_wd)
+      
+      orig_plot_bld$grobs[[grob_strip_index[i]]] <- tot_tree
+    }
+    orig_plot <- ggdraw(orig_plot_bld)
+  }
+
   logo_size <- 0.06
   
   ## is image taller than wider? if so, make sure the width is at least the base_size
@@ -98,6 +122,7 @@ theme_SB <-  theme(
   panel.border = element_rect(color = 'darkblue', fill = NA),
   panel.background = element_rect(fill = 'white', color = 'transparent'),
   axis.ticks = element_line(color = 'darkblue', size = 0.5),
+  axis.ticks.length = unit(2.75, 'pt'),
   axis.title = element_text(size = 8),
   axis.text = element_text(size = 7, color = 'darkblue'),
   plot.title = element_text(size = 14),
@@ -121,6 +146,7 @@ vid_theme_SB <-  theme(
   panel.border = element_rect(color = 'darkblue', fill = NA),
   panel.background = element_rect(fill = 'white', color = 'transparent'),
   axis.ticks = element_line(color = 'darkblue', size = 1.5),
+  axis.ticks.length = unit(8.25, 'pt'),
   axis.title = element_text(size = 24),
   axis.text = element_text(size = 21, color = 'darkblue'),
   plot.title = element_text(size = 42),
