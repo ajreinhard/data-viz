@@ -25,7 +25,7 @@ helmet_url = function(x) ifelse(is.na(x),NA,paste0('https://raw.githubuserconten
 ESPN_logo_url = function(x) ifelse(is.na(x),NA,ifelse(x=='KC',paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/alt-logo/',x,'.png'),paste0('https://a.espncdn.com/i/teamlogos/nfl/500/',x,'.png')))
 
 # my prefered team order for facets
-.tm_div_order <- c('BUF', 'MIA', 'NE', 'NYJ', 'BAL', 'CIN', 'CLE', 'PIT', 'HOU', 'IND', 'JAX', 'TEN', 'DEN', 'KC', 'LAC', 'LV', 'DAL', 'NYG', 'PHI', 'WAS', 'CHI', 'DET', 'GB', 'MIN', 'ATL', 'CAR', 'NO', 'TB', 'ARI', 'LA', 'SF', 'SEA')
+.tm_div_order <- c('BUF', 'MIA', 'NE', 'NYJ', 'BAL', 'CIN', 'CLE', 'PIT', 'HOU', 'IND', 'JAX', 'TEN', 'DEN', 'KC', 'LAC', 'LV', 'DAL', 'NYG', 'PHI', 'WAS', 'CHI', 'DET', 'GB', 'MIN', 'ATL', 'CAR', 'NO', 'TB', 'ARI', 'LA', 'SEA', 'SF')
 .tm_div_order_alt <- c('BUF', 'MIA', 'NE', 'NYJ', 'DAL', 'NYG', 'PHI', 'WAS', 'BAL', 'CIN', 'CLE', 'PIT', 'CHI', 'DET', 'GB', 'MIN', 'HOU', 'IND', 'JAX', 'TEN', 'ATL', 'CAR', 'NO', 'TB', 'DEN', 'KC', 'LAC', 'LV', 'ARI', 'LA', 'SEA', 'SF')
 
 # main function to save my branded plots
