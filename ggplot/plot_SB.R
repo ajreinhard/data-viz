@@ -22,7 +22,7 @@ font_SB <- ifelse(length(grep('HP Simplified',fonts()))>0,'HP Simplified','Bahns
 # functions to retrieve images
 wordmark_url = function(x) ifelse(is.na(x),NA,paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/wordmark/',x,'.png'))
 helmet_url = function(x) ifelse(is.na(x),NA,paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/helmet_left/',x,'.png'))
-ESPN_logo_url = function(x) ifelse(is.na(x),NA,ifelse(x %in% c('WAS','KC'),paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/alt-logo/',x,'.png'),paste0('https://a.espncdn.com/i/teamlogos/nfl/500/',x,'.png')))
+ESPN_logo_url = function(x) ifelse(is.na(x),NA,ifelse(x=='KC',paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/alt-logo/',x,'.png'),paste0('https://a.espncdn.com/i/teamlogos/nfl/500/',x,'.png')))
 
 # my prefered team order for facets
 .tm_div_order <- c('BUF', 'MIA', 'NE', 'NYJ', 'BAL', 'CIN', 'CLE', 'PIT', 'HOU', 'IND', 'JAX', 'TEN', 'DEN', 'KC', 'LAC', 'LV', 'DAL', 'NYG', 'PHI', 'WAS', 'CHI', 'DET', 'GB', 'MIN', 'ATL', 'CAR', 'NO', 'TB', 'ARI', 'LA', 'SF', 'SEA')
@@ -135,7 +135,9 @@ theme_SB <-  theme(
   axis.title.y = element_text(angle = 0, vjust = 0.5),
   strip.background = element_blank(),
   strip.text = element_text(size = 6, color = 'darkblue', family = font_SB),
-  legend.position = 'bottom'
+  legend.position = 'bottom',
+  panel.spacing.y = unit(0, 'lines'),
+  panel.spacing.x = unit(0.1, 'lines')
 ) 
 
 # StatButler theme for animations
@@ -160,8 +162,29 @@ vid_theme_SB <-  theme(
   strip.background = element_blank(),
   strip.text = element_text(size = 18, color = 'darkblue', family = font_SB)
 )
-  
-
+				     
+table_theme_SB <- tab_options(
+  table.font.color = 'darkblue',
+  data_row.padding = '2px',
+  row_group.padding = '3px',
+  table.width = '800px',
+  column_labels.border.bottom.color = 'darkblue',
+  column_labels.border.bottom.width = 1.4,
+  table_body.border.top.color = 'darkblue',
+  row_group.border.top.width = 1.5,
+  row_group.border.top.color = '#999999',
+  table_body.border.bottom.width = 0.7,
+  table_body.border.bottom.color = '#999999',
+  row_group.border.bottom.width = 1,
+  row_group.border.bottom.color = 'darkblue',
+  table.border.top.color = 'transparent',
+  table.background.color = '#F2F2F2',
+  table.border.bottom.color = 'transparent',
+  row.striping.background_color = '#FFFFFF',
+  row.striping.include_table_body = TRUE
+)
+				     
+				     
 # function to set rounded plot limits
 properLims <- function(vec) {
   labs <- labeling::extended(min(vec, na.rm = T), max(vec, na.rm = T), m = 5)
@@ -174,6 +197,12 @@ properLims <- function(vec) {
 plus_lab = function(x, accuracy = NULL, suffix = '') paste0(ifelse(x>0,'+',''),number(x, accuracy = accuracy, suffix = suffix, scale = ifelse(suffix == '%', 100, 1)))
 plus_lab_format <- function (accuracy = NULL, suffix = '') function(x) plus_lab(x, accuracy = accuracy, suffix = suffix)
 
+full_alpha_hex = function(color, alpha) {
+  old_rgb <- col2rgb(color)
+  new_rgb <- (255 - (255 - old_rgb) * alpha) / 255
+  return(rgb(new_rgb['red',], new_rgb['green',], new_rgb['blue',]))
+}
+	
 # function to set rounded plot limits if scale_x_reverse is used
 properLimsRev <- function(vec) {
   labs <- labeling::extended(min(vec, na.rm = T), max(vec, na.rm = T), m = 5)
@@ -356,8 +385,8 @@ NFL_pri <- c('ARI'='#97233f',
 'NO'='#9f8958',
 'NYG'='#0b2265',
 'NYJ'='#125740',
-'OAK'='#a5acaf',
-'LV'='#a5acaf',
+'OAK'='#000000',
+'LV'='#000000',
 'PHI'='#004953',
 'PIT'='#000000',
 'SD'='#002244',	     	     
@@ -393,8 +422,8 @@ NFL_sec <- c('ARI'='#000000',
 'NO'='#000000',
 'NYG'='#a71930',
 'NYJ'='#000000',
-'OAK'='#000000',
-'LV'='#000000',
+'OAK'='#a5acaf',
+'LV'='#a5acaf',
 'PHI'='#a5acaf',
 'PIT'='#ffb612',
 'SD'='#0073cf',
