@@ -164,7 +164,9 @@ vid_theme_SB <-  theme(
   strip.text = element_text(size = 18, color = 'darkblue', family = font_SB)
 )
 				     
-table_theme_SB <- tab_options(
+table_theme_SB <- function (data) {
+  data %>%
+  tab_options(
   table.font.color = 'darkblue',
   data_row.padding = '2px',
   row_group.padding = '3px',
@@ -183,7 +185,8 @@ table_theme_SB <- tab_options(
   table.border.bottom.color = 'transparent',
   row.striping.background_color = '#FFFFFF',
   row.striping.include_table_body = TRUE
-)
+  ) %>% return
+}
 				     
 				     
 # function to set rounded plot limits
