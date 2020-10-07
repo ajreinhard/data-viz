@@ -92,10 +92,10 @@ brand_plot <- function(orig_plot, save_name, asp = 1, base_size = 5, data_home =
       border_layers <- c(border_layers, annotation_custom(make_gradient(deg = 90 + axis_adj), xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=y_lim[1]))
     }
     if (grepl('r',fade_borders)) {
-      border_layers <- c(border_layers, annotation_custom(make_gradient(deg = 0 - axis_adj), xmin=x_lim[2], xmax=Inf, ymin=-Inf, ymax=Inf))
+      border_layers <- c(border_layers, annotation_custom(make_gradient(deg = 0 + axis_adj), xmin=x_lim[2], xmax=Inf, ymin=-Inf, ymax=Inf))
     }
     if (grepl('l',fade_borders)) {
-      border_layers <- c(border_layers, annotation_custom(make_gradient(deg = 180 - axis_adj), xmin=-Inf, xmax=x_lim[1], ymin=-Inf, ymax=Inf))
+      border_layers <- c(border_layers, annotation_custom(make_gradient(deg = 180 + axis_adj), xmin=-Inf, xmax=x_lim[1], ymin=-Inf, ymax=Inf))
     }
     orig_plot$layers <- c(orig_plot$layers, border_layers)
     
