@@ -16,6 +16,8 @@ library(magrittr)
 library(tidyverse)
 library(gganimate)
 library(gt)
+library(ggridges)
+library(nflfastR)
 
 # decide what font I should use based on what is available on computer
 font_SB <- ifelse(length(grep('HP Simplified',fonts()))>0,'HP Simplified','Bahnschrift')
@@ -83,21 +85,29 @@ brand_plot <- function(orig_plot, save_name, asp = 1, base_size = 5, data_home =
       y_lim <- axis_limits_y(orig_plot) * fade_prop + ggplot_build(orig_plot)$layout$panel_params[[1]]$x.range * (1-fade_prop)
     }
     
-    ## figure out which sides to fade
-    border_layers <- c()
-    if (grepl('t',fade_borders)) {
-      border_layers <- c(border_layers, annotation_custom(make_gradient(deg = 270 + axis_adj), xmin=-Inf, xmax=Inf, ymin=y_lim[2], ymax=Inf))
-    }
-    if (grepl('b',fade_borders)) {
+  ## figure out which sides to fade
+  border_layers <- c()
+  if (grepl('t',fade_borders)) {
+    border_layers <- c(border_layers, annotation_custom(make_gradient(deg = 270 + axis_adj), xmin=-Inf, xmax=Inf, ymin=y_lim[2], ymax=Inf))
+  }
+  if (grepl('b',fade_borders)) {
+    if (axis_rot) {
+      border_layers <- c(border_layers, annotation_custom(make_gradient(deg = 180 - axis_adj), xmin=-Inf, xmax=x_lim[1], ymin=-Inf, ymax=Inf))
+    } else {
       border_layers <- c(border_layers, annotation_custom(make_gradient(deg = 90 + axis_adj), xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=y_lim[1]))
     }
-    if (grepl('r',fade_borders)) {
-      border_layers <- c(border_layers, annotation_custom(make_gradient(deg = 0 - axis_adj), xmin=x_lim[2], xmax=Inf, ymin=-Inf, ymax=Inf))
-    }
-    if (grepl('l',fade_borders)) {
+  }
+  if (grepl('r',fade_borders)) {
+    border_layers <- c(border_layers, annotation_custom(make_gradient(deg = 0 - axis_adj), xmin=x_lim[2], xmax=Inf, ymin=-Inf, ymax=Inf))
+  }
+  if (grepl('l',fade_borders)) {
+    if (axis_rot) {
+      border_layers <- c(border_layers, annotation_custom(make_gradient(deg = 90 + axis_adj), xmin=-Inf, xmax=Inf, ymin=-Inf, ymax=y_lim[1]))
+    } else {
       border_layers <- c(border_layers, annotation_custom(make_gradient(deg = 180 - axis_adj), xmin=-Inf, xmax=x_lim[1], ymin=-Inf, ymax=Inf))
     }
-    orig_plot$layers <- c(orig_plot$layers, border_layers)
+  }
+  orig_plot$layers <- c(orig_plot$layers, border_layers)
     
     ## add axis (or not) to unfaded
     orig_plot <- orig_plot +
