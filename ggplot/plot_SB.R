@@ -200,9 +200,12 @@ table_theme_SB <- function (data) {
   ) %>% return
 }
 
+
 # add logo to table and space around outside of image
-brand_table <- function(file, t = 3, r = 6, b = 8, l = 6) {
-  img <- png::readPNG('team off 2020.png')
+brand_table <- function(gt_table, file, data_home, t = 3, r = 6, b = 8, l = 6) {
+  gt_table %>% gtsave(file)
+  
+  img <- png::readPNG(file)
   img <- img[11:(nrow(img)-10),11:(ncol(img)-10),]
   
   p <- ggplot(iris, aes(Species, Sepal.Length))+
@@ -213,8 +216,9 @@ brand_table <- function(file, t = 3, r = 6, b = 8, l = 6) {
       plot.background = element_rect(fill = 'grey95', color = NA)
     )
   
-  brand_plot(p, asp = ncol(img)/nrow(img), save_name = 'team off 2020.png', data_home = 'Data: @nflfastR')
-}				     
+  brand_plot(p, asp = ncol(img)/nrow(img), save_name = file, data_home = data_home)
+}	
+		     
 				     
 				     
 # function to set rounded plot limits
