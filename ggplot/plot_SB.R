@@ -373,6 +373,118 @@ body(animate_SB) <- body(animate_SB) %>%
   as.call()
 
 
+# functions for manipulating games files from 538 or nflgamedata.com				     
+double_games <- function(df) {
+  home_tms <- df %>% 
+    rename_with(function(x) gsub('home_','team_', x), contains('home_')) %>% 
+    rename_with(function(x) gsub('away_','opp_', x), contains('away_')) %>% 
+    rename(team = team_team, opp = opp_team)
+  
+  away_tms <- df %>% 
+    rename_with(function(x) gsub('away_','team_', x), contains('away_')) %>% 
+    rename_with(function(x) gsub('home_','opp_', x), contains('home_')) %>% 
+    rename(team = team_team, opp = opp_team) %>% 
+    mutate(location = ifelse(location == 'Home', 'Away', location)) %>% 
+    mutate_at(vars(one_of('result','spread_line')), function(x) -x) %>% 
+    relocate(home_tms %>% names)
+  
+  rbind(away_tms, home_tms) %>% arrange(gameday) %>% return
+}
+
+# convert team cols to franchise
+team2fran <- function (df) {
+  df %>% 
+    mutate_at(
+      .vars = vars(ends_with('team')),
+      .funs = function(tm) {
+        case_when(
+          tm %in% c('OAK','LRD') ~ 'LV',
+          tm %in% c('STL', 'LAR', 'LRM') ~ 'LA',
+          tm == 'SD' ~ 'LAC',
+          tm == 'HSO' ~ 'TEN',
+          tm == 'BLC' ~ 'IND',
+          TRUE ~ tm
+        )
+      }
+    ) %>% 
+    return
+}
+
+# convert franchise cols to team
+fran2team <- function (df) {
+  df %>% 
+    mutate_at(
+      .vars = vars(ends_with('team')),
+      season = df %>% pull(season),
+      .funs = function(tm, season) {
+        case_when(
+          tm == 'NE' & season < 1971 ~ 'BOS',
+          tm == 'Lv' & season < 1982 ~ 'OAK',
+          tm == 'IND' & season < 1984 ~ 'BLC',
+          tm == 'ARI' & season < 1988 ~ 'SLC',
+          tm == 'ARI' & season < 1994 ~ 'PHX',
+          tm == 'LV' & season < 1995 ~ 'LRD',
+          tm == 'LA' & season < 1995 ~ 'LRM',
+          tm == 'TEN' & season < 1997 ~ 'HSO',
+          tm == 'TEN' & season < 1999 ~ 'TNO',
+          tm == 'LA' & season < 2016 ~ 'STL',
+          tm == 'LAC' & season < 2017 ~ 'SD',
+          tm == 'LV' & season < 2020 ~ 'OAK',
+          TRUE ~ tm
+        )
+      }
+    ) %>% 
+    return
+}
+
+#used for creating game_id below
+leading_zero <- function(x, max_len) sapply(x, function(y) ifelse(nchar(y) >= max_len, y, paste0(rep('0', max_len - nchar(y)), y)))
+
+#get 538 elo data frame
+get_538elo <- function() {
+  read.csv('https://projects.fivethirtyeight.com/nfl-api/nfl_elo.csv', stringsAsFactors = F) %>% 
+    rename(gameday = date, game_type = playoff, location = neutral) %>% 
+    rename_with(function(x) paste0('home_', gsub('1','', x)), contains('1')) %>% 
+    rename_with(function(x) paste0('away_', gsub('2','', x)), contains('2')) %>% 
+    team2fran %>% 
+    fran2team %>% 
+    group_by(season) %>% 
+    mutate(
+      gameday = as.Date(gameday),
+      weekday = format(gameday, '%A'), 
+      week1_wed = min(gameday) - as.numeric(format(min(gameday), '%u')) + 3,
+      week = as.numeric(ceiling((gameday - week1_wed)/7)),
+      week = ifelse(gameday == '2012-09-05', 1, week),
+      week = ifelse(season == 2001 & week > 1, week - 1, week),
+      week1_wed = NULL,
+      home_team = case_when(
+        home_team == 'WSH' ~ 'WAS',
+        TRUE ~ home_team
+      ),
+      away_team = case_when(
+        away_team == 'WSH' ~ 'WAS',
+        TRUE ~ away_team
+      ),
+      game_id = paste(season, leading_zero(week, 2), away_team, home_team, sep = '_'),
+      game_type = case_when(
+        game_type == 's' ~ 'SB',
+        game_type == 'c' ~ 'CON',
+        game_type == 'd' ~ 'DIV',
+        game_type == 'w' ~ 'WC',
+        game_type == '' ~ 'REG'
+      ),
+      location = ifelse(location == 0, 'Home', 'Neutral'),
+      result = home_score - away_score,
+      total = home_score + away_score
+    ) %>%
+    ungroup %>% 
+    relocate(game_id) %>% 
+    relocate(c(game_type, week, gameday, weekday), .after = season) %>% 
+    relocate(c(home_score, away_score, location, result, total), .after = away_team) %>% 
+    return
+}
+
+	      				     
 color_SB <- c("#ff7f00", "#9932cc", "#8cff72", "#00008b", "#51dbd8", "#674b00", "#ff66cf", "#8f8f8f", "#ff0000", "#e1ed00", "#0b5209", "#636363")
 
 NFL_pri <- c('ARI'='#97233f',
