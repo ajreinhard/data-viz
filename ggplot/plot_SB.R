@@ -18,6 +18,7 @@ library(gganimate)
 library(gt)
 library(ggridges)
 library(nflfastR)
+library(emphatic)
 
 # decide what font I should use based on what is available on computer
 font_SB <- ifelse(length(grep('HP Simplified',fonts()))>0,'HP Simplified','Bahnschrift')
@@ -26,6 +27,7 @@ font_SB <- ifelse(length(grep('HP Simplified',fonts()))>0,'HP Simplified','Bahns
 wordmark_url = function(x) ifelse(is.na(x),NA,paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/wordmark/',x,'.png'))
 helmet_url = function(x) ifelse(is.na(x),NA,paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/helmet_left/',x,'.png'))
 ESPN_logo_url = function(x) ifelse(is.na(x),NA,ifelse(x=='KC',paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/alt-logo/',x,'.png'),paste0('https://a.espncdn.com/i/teamlogos/nfl/500/',x,'.png')))
+helm2020 <- function(team, side) paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/2020_helm/',team,'_',side,'.png')
 
 # my prefered team order for facets
 .tm_div_order <- c('BUF', 'MIA', 'NE', 'NYJ', 'BAL', 'CIN', 'CLE', 'PIT', 'HOU', 'IND', 'JAX', 'TEN', 'DEN', 'KC', 'LAC', 'LV', 'DAL', 'NYG', 'PHI', 'WAS', 'CHI', 'DET', 'GB', 'MIN', 'ATL', 'CAR', 'NO', 'TB', 'ARI', 'LA', 'SEA', 'SF')
@@ -197,6 +199,22 @@ table_theme_SB <- function (data) {
   row.striping.include_table_body = TRUE
   ) %>% return
 }
+
+# add logo to table and space around outside of image
+brand_table <- function(file, t = 3, r = 6, b = 8, l = 6) {
+  img <- png::readPNG('team off 2020.png')
+  img <- img[11:(nrow(img)-10),11:(ncol(img)-10),]
+  
+  p <- ggplot(iris, aes(Species, Sepal.Length))+
+    annotation_custom(rasterGrob(img, width = unit(1,"npc"), height = unit(1,"npc")), -Inf, Inf, -Inf, Inf) +
+    theme_void() +
+    theme(
+      plot.margin = unit(c(t,r,b,l),units = 'points'),
+      plot.background = element_rect(fill = 'grey95', color = NA)
+    )
+  
+  brand_plot(p, asp = ncol(img)/nrow(img), save_name = 'team off 2020.png', data_home = 'Data: @nflfastR')
+}				     
 				     
 				     
 # function to set rounded plot limits
@@ -291,6 +309,18 @@ grob_img_adj<-function(img_url, alpha = 0, whitewash = 0) {
   }))
 }
 
+#functions to get pbp quickly
+get_pbp <- function(seasons = 2020)  do.call(rbind, lapply(seasons, function(yr) {
+  readRDS(url(paste0('https://raw.githubusercontent.com/guga31bb/nflfastR-data/master/data/play_by_play_',yr,'.rds')))
+}))
+
+get_full_pbp <- function(seasons = 2020)  do.call(rbind, lapply(seasons, function(yr) {
+  readRDS(url(paste0('https://raw.githubusercontent.com/ajreinhard/NFL/master/full-pbp/',yr,'.rds')))
+}))
+
+#function to get nflgamedata.com games
+get_games <- function() readRDS(url('http://nflgamedata.com/games.rds'))
+				     
 # used to create branded videos
 Scene2 <- ggproto(
   "Scene2",
