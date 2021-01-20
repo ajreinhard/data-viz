@@ -433,10 +433,12 @@ team2fran <- function (df) {
       .funs = function(tm) {
         case_when(
           tm %in% c('OAK','LRD') ~ 'LV',
+          tm %in% c('SLC','PHX') ~ 'ARI',
+          tm %in% c('HSO','TNO') ~ 'TEN',		
           tm %in% c('STL', 'LAR', 'LRM') ~ 'LA',
           tm == 'SD' ~ 'LAC',
-          tm == 'HSO' ~ 'TEN',
           tm == 'BLC' ~ 'IND',
+          tm == 'BOS' ~ 'NE',		
           TRUE ~ tm
         )
       }
@@ -453,7 +455,7 @@ fran2team <- function (df) {
       .funs = function(tm, season) {
         case_when(
           tm == 'NE' & season < 1971 ~ 'BOS',
-          tm == 'Lv' & season < 1982 ~ 'OAK',
+          tm == 'LV' & season < 1982 ~ 'OAK',
           tm == 'IND' & season < 1984 ~ 'BLC',
           tm == 'ARI' & season < 1988 ~ 'SLC',
           tm == 'ARI' & season < 1994 ~ 'PHX',
