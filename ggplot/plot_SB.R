@@ -68,7 +68,7 @@ brand_plot <- function(orig_plot, save_name, asp = 1, base_size = 5, data_home =
   }
   
   ## local logo to read in
-  logo_file <- readPNG(getURLContent('https://raw.githubusercontent.com/ajreinhard/data-viz/master/ggplot/statbutler.png'))
+  logo_file <- readPNG(getURLContent('https://raw.githubusercontent.com/ajreinhard/data-viz/master/ggplot/statbutler2.png'))
   
   author_txt <- textGrob('By Anthony Reinhard', x=unit(0.08 * (base_size_rat_wid), 'npc'), gp=gpar(col='darkblue', fontfamily=font_SB, fontsize=6), hjust=0)
   data_txt <- textGrob(data_home, x=unit(1 - (.01 * (base_size_rat_wid)), 'npc'), gp=gpar(col='grey95', fontfamily=font_SB, fontsize=6), hjust=1)
