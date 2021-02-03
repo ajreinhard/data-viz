@@ -176,13 +176,13 @@ vid_theme_SB <-  theme(
   strip.text = element_text(size = 18, color = 'darkblue', family = font_SB)
 )
 				     
-table_theme_SB <- function (data) {
+table_theme_SB <- function (data, width = 800) {
   data %>%
   tab_options(
   table.font.color = 'darkblue',
   data_row.padding = '2px',
   row_group.padding = '3px',
-  table.width = '800px',
+  table.width = paste0(width,'px'),
   column_labels.border.bottom.color = 'darkblue',
   column_labels.border.bottom.width = 1.4,
   table_body.border.top.color = 'darkblue',
@@ -202,7 +202,7 @@ table_theme_SB <- function (data) {
 
 
 # add logo to table and space around outside of image
-brand_table <- function(gt_table, file, data_home, t = 3, r = 6, b = 8, l = 6) {
+brand_table <- function(gt_table, file, data_home, base_size = base_size, t = 3, r = 6, b = 8, l = 6) {
   gt_table %>% gtsave(file)
   
   img <- png::readPNG(file)
@@ -216,7 +216,7 @@ brand_table <- function(gt_table, file, data_home, t = 3, r = 6, b = 8, l = 6) {
       plot.background = element_rect(fill = 'grey95', color = NA)
     )
   
-  brand_plot(p, asp = ncol(img)/nrow(img), save_name = file, data_home = data_home)
+  brand_plot(p, asp = ncol(img)/nrow(img), save_name = file, data_home = data_home, base_size = base_size)
 }	
 		     
 				     
@@ -324,7 +324,46 @@ get_full_pbp <- function(seasons = 2020)  do.call(rbind, lapply(seasons, functio
 
 #function to get nflgamedata.com games
 get_games <- function() readRDS(url('http://nflgamedata.com/games.rds'))
-				     
+				
+#adds expected points over incomplete metric (EPOI)	     
+add_epoi <- function(pbp_df) {
+  no_fumble_return <- pbp_df %>% 
+    filter(complete_pass == 1 & fumble_lost == 1) %>% 
+    select(game_id, play_id, yards_gained, half_seconds_remaining, yardline_100, season, home_team, posteam, defteam, roof, down, ydstogo, posteam_timeouts_remaining, defteam_timeouts_remaining) %>% 
+    mutate(
+      down = 1,
+      half_seconds_remaining = ifelse(half_seconds_remaining < 6, 0, half_seconds_remaining - 6),
+      yardline_100 = 99 - (yardline_100 - yards_gained),
+      posteam = defteam,
+      ydstogo = 10
+    ) %>% 
+    calculate_expected_points %>% 
+    mutate(ep = -ep) %>% 
+    select(game_id, play_id, no_fumb_ret_EP = ep)
+  
+  
+  pbp_df %>% 
+    select(game_id, play_id, half_seconds_remaining, yardline_100, season, home_team, posteam, defteam, roof, down, ydstogo, posteam_timeouts_remaining, defteam_timeouts_remaining) %>% 
+    mutate(
+      pos_change = ifelse(down == 4, 1, 0),
+      down = ifelse(pos_change == 1, 1, down + 1),
+      half_seconds_remaining = ifelse(half_seconds_remaining < 5, 0, half_seconds_remaining - 5),
+      yardline_100 = ifelse(pos_change == 1, 99 - yardline_100, yardline_100),
+      posteam = ifelse(pos_change == 1, defteam, posteam),
+      ydstogo = ifelse(pos_change == 1, 10, ydstogo)
+    ) %>% 
+    calculate_expected_points %>% 
+    mutate(ep = ifelse(pos_change == 1, -ep, ep)) %>% 
+    select(game_id, play_id, incomplete_ep = ep) %>% 
+    left_join(no_fumble_return) %>% 
+    right_join(pbp_df) %>% 
+    mutate(
+      epoi = ifelse(is.na(no_fumb_ret_EP), ep + epa, no_fumb_ret_EP) - incomplete_ep,
+      epoi = ifelse(complete_pass == 1, epoi, 0)
+    ) %>% 
+    return
+}
+
 # used to create branded videos
 Scene2 <- ggproto(
   "Scene2",
