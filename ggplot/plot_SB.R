@@ -297,21 +297,36 @@ axis_limits_y <- function(p) {
 }
 
 # reads in an image as a grob and allows for some image alterations
-
-grob_img_adj<-function(img_url, alpha = 0, whitewash = 0) {
+grob_img_adj <- function(img_url, alpha = 1, whitewash = 0, boost_color = T, bw = F) {
   return(lapply(img_url, function(x) {
     if(is.na(x)) {
       return(NULL)
-    }else{     
+    } else {     
       img <- image_read(x)[[1]]
-      img[1,,] <- as.raw(255 - (255 - as.integer(img[1,,])) * (1-whitewash))
-      img[2,,] <- as.raw(255 - (255 - as.integer(img[2,,])) * (1-whitewash))
-      img[3,,] <- as.raw(255 - (255 - as.integer(img[3,,])) * (1-whitewash))
-      img[4,,] <- as.raw(as.integer(img[4,,]) * (1-alpha))
+      
+      if (bw) {
+        grey_scale <- as.integer(img[1,,]) * 0.3 + as.integer(img[2,,]) * 0.59 + as.integer(img[3,,]) * 0.11
+        img[1,,] <- as.raw(grey_scale)
+        img[2,,] <- as.raw(grey_scale)
+        img[3,,] <- as.raw(grey_scale)
+      }
+
+      lowest_alpha <- function(x) (255 - as.integer(x)) / 255
+      alpha_min <- sapply(1:3, function(x) lowest_alpha(img[x,,])) %>%
+        apply(., 1, max) %>% 
+        ifelse(. >= alpha, ., alpha)
+      
+      if(!boost_color) {alpha_min <- 1}
+      
+      img[1,,] <- as.raw(255 - (255 - as.integer(img[1,,])) * (1-whitewash)  * (1/alpha_min))
+      img[2,,] <- as.raw(255 - (255 - as.integer(img[2,,])) * (1-whitewash) * (1/alpha_min))
+      img[3,,] <- as.raw(255 - (255 - as.integer(img[3,,])) * (1-whitewash) * (1/alpha_min))
+      img[4,,] <- as.raw(as.integer(img[4,,]) * alpha)
       return(grid::rasterGrob(image = image_read(img)))
     }
   }))
 }
+
 
 #functions to get pbp quickly
 get_pbp <- function(seasons = 2020)  do.call(rbind, lapply(seasons, function(yr) {
