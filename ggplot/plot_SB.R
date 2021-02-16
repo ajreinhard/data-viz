@@ -373,7 +373,7 @@ Scene2 <- ggproto(
     plot <- ggplot_gtable(plot)
     
     # insert changes here
-    logo_file <- readPNG(getURLContent('https://raw.githubusercontent.com/ajreinhard/data-viz/master/ggplot/statbutler.png'))
+    logo_file <- magick::image_read('https://raw.githubusercontent.com/ajreinhard/data-viz/master/ggplot/statbutler.png')
     
     author_txt <- textGrob('By Anthony Reinhard', x=unit(0.065, 'npc'), gp=gpar(col='darkblue', fontfamily=font_SB, fontsize=18), hjust=0)
     data_txt <- textGrob(self$data_home, x=unit(1 - (.01), 'npc'), gp=gpar(col='grey95', fontfamily=font_SB, fontsize=18), hjust=1)
