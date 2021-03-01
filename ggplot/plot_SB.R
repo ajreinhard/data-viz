@@ -26,7 +26,12 @@ font_SB <- ifelse(length(grep('HP Simplified',fonts()))>0,'HP Simplified','Bahns
 # functions to retrieve images
 wordmark_url = function(x) ifelse(is.na(x),NA,paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/wordmark/',x,'.png'))
 helmet_url = function(x) ifelse(is.na(x),NA,paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/helmet_left/',x,'.png'))
-ESPN_logo_url = function(x) ifelse(is.na(x),NA,ifelse(x=='KC',paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/alt-logo/',x,'.png'),paste0('https://a.espncdn.com/i/teamlogos/nfl/500/',x,'.png')))
+ESPN_logo_url = function(x) ifelse(is.na(x),NA,
+				   ifelse(x=='KC',paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/alt-logo/KC.png'),
+				   ifelse(x %in% c('TNO','HSO'),paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/alt-logo/HSO.png'),
+				   ifelse(x=='LRM',paste0('https://a.espncdn.com/i/teamlogos/nfl/500/STL.png'),
+				   ifelse(x=='LRD',paste0('https://a.espncdn.com/i/teamlogos/nfl/500/LV.png'),
+				   paste0('https://a.espncdn.com/i/teamlogos/nfl/500/',x,'.png'))))))
 helm2020 <- function(team, side) paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/2020_helm/',team,'_',side,'.png')
 
 # my prefered team order for facets
