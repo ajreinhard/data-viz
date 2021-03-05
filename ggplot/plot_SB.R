@@ -18,7 +18,7 @@ library(gganimate)
 library(gt)
 library(ggridges)
 library(nflfastR)
-#library(emphatic)
+library(emphatic)
 
 # decide what font I should use based on what is available on computer
 font_SB <- ifelse(length(grep('HP Simplified',fonts()))>0,'HP Simplified','Bahnschrift')
@@ -26,12 +26,8 @@ font_SB <- ifelse(length(grep('HP Simplified',fonts()))>0,'HP Simplified','Bahns
 # functions to retrieve images
 wordmark_url = function(x) ifelse(is.na(x),NA,paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/wordmark/',x,'.png'))
 helmet_url = function(x) ifelse(is.na(x),NA,paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/helmet_left/',x,'.png'))
-ESPN_logo_url = function(x) ifelse(is.na(x),NA,
-				   ifelse(x=='KC',paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/alt-logo/KC.png'),
-				   ifelse(x %in% c('TNO','HSO'),paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/alt-logo/HSO.png'),
-				   ifelse(x=='LRM',paste0('https://a.espncdn.com/i/teamlogos/nfl/500/STL.png'),
-				   ifelse(x=='LRD',paste0('https://a.espncdn.com/i/teamlogos/nfl/500/LV.png'),
-				   paste0('https://a.espncdn.com/i/teamlogos/nfl/500/',x,'.png'))))))
+ESPN_logo_url <- function(x) ifelse(is.na(x),NA,paste0('https://a.espncdn.com/i/teamlogos/nfl/500/',x,'.png'))
+alt_logo_url <- function(x) ifelse(is.na(x),NA,paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/alt-logo/',x,'.png'))
 helm2020 <- function(team, side) paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/2020_helm/',team,'_',side,'.png')
 
 # my prefered team order for facets
@@ -338,10 +334,6 @@ get_pbp <- function(seasons = 2020)  do.call(rbind, lapply(seasons, function(yr)
   readRDS(url(paste0('https://raw.githubusercontent.com/guga31bb/nflfastR-data/master/data/play_by_play_',yr,'.rds')))
 }))
 
-get_full_pbp <- function(seasons = 2020)  do.call(rbind, lapply(seasons, function(yr) {
-  readRDS(url(paste0('https://raw.githubusercontent.com/ajreinhard/NFL/master/full-pbp/',yr,'.rds')))
-}))
-
 #function to get nflgamedata.com games
 get_games <- function() readRDS(url('http://nflgamedata.com/games.rds'))
 				
@@ -492,9 +484,9 @@ team2fran <- function (df) {
       .funs = function(tm) {
         case_when(
           tm %in% c('OAK','LRD') ~ 'LV',
-          tm %in% c('SLC','PHX') ~ 'ARI',
-          tm %in% c('HSO','TNO') ~ 'TEN',		
-          tm %in% c('STL', 'LAR', 'LRM') ~ 'LA',
+          tm %in% c('SLC','PHX') ~ 'ARI',		
+          tm %in% c('STL','LAR') ~ 'LA',
+          tm == 'HSO' ~ 'TEN',
           tm == 'SD' ~ 'LAC',
           tm == 'BLC' ~ 'IND',
           tm == 'BOS' ~ 'NE',		
@@ -519,9 +511,7 @@ fran2team <- function (df) {
           tm == 'ARI' & season < 1988 ~ 'SLC',
           tm == 'ARI' & season < 1994 ~ 'PHX',
           tm == 'LV' & season < 1995 ~ 'LRD',
-          tm == 'LA' & season < 1995 ~ 'LRM',
           tm == 'TEN' & season < 1997 ~ 'HSO',
-          tm == 'TEN' & season < 1999 ~ 'TNO',
           tm == 'LA' & season < 2016 ~ 'STL',
           tm == 'LAC' & season < 2017 ~ 'SD',
           tm == 'LV' & season < 2020 ~ 'OAK',
@@ -532,6 +522,66 @@ fran2team <- function (df) {
     return
 }
 
+# get URL to a historical team logo 
+hist_logo_url <- function (df) {
+  df %>% 
+    mutate(
+      logo_url = case_when(
+        team == 'ARI' & season < 2005 ~ alt_logo_url('ARI94'),
+        team == 'ATL' & season < 2003 ~ alt_logo_url('ATL90'),
+        team == 'BAL' & season < 1999 ~ alt_logo_url('BAL96'),
+        team == 'CAR' & season < 2012 ~ alt_logo_url('CAR95'),
+	team == 'CIN' & season < 1997 ~ alt_logo_url('CIN90'),
+        team == 'CIN' & season < 2004 ~ alt_logo_url('CIN97'),
+        team == 'CLE' & season < 2006 ~ alt_logo_url('CLE99'),
+        team == 'CLE' & season < 2015 ~ alt_logo_url('CLE06'),
+        team == 'DEN' & season < 1997 ~ alt_logo_url('DEN93'),
+        team == 'DET' & season < 2003 ~ alt_logo_url('DET70'),
+        team == 'DET' & season < 2009 ~ alt_logo_url('DET03'),
+        team == 'DET' & season < 2017 ~ alt_logo_url('DET09'),
+        team == 'IND' & season < 2002 ~ alt_logo_url('IND84'),
+        team == 'JAX' & season < 2002 ~ alt_logo_url('JAX95'),
+        team == 'JAX' & season < 2013 ~ alt_logo_url('JAX02'),
+        team == 'LAC' & season < 2020 ~ alt_logo_url('LAC17'),
+        team == 'SD' & season < 2002 ~ alt_logo_url('SD88'),
+        team == 'SD' & season < 2007 ~ alt_logo_url('SD02'),
+        team == 'SD' ~ alt_logo_url('LAC17'),
+        team == 'LA' & season < 1995 ~ alt_logo_url('LA89'),
+        team == 'STL' & season < 2000 ~ alt_logo_url('STL95'),
+        team == 'LA' & season < 2017 ~ alt_logo_url('LA16'),
+        team == 'LA' & season < 2020 ~ alt_logo_url('LA17'),
+        team == 'STL' ~ alt_logo_url('LA16'),
+        team == 'MIA' & season < 1997 ~ alt_logo_url('MIA89'),
+        team == 'MIA' & season < 2013 ~ alt_logo_url('MIA97'),
+        team == 'MIA' & season < 2018 ~ alt_logo_url('MIA13'),
+        team == 'MIA' ~ alt_logo_url('MIA'),
+        team == 'NE' & season < 2000 ~ alt_logo_url('NE93'),
+        team == 'NO' & season < 2000 ~ alt_logo_url('NO67'),
+        team == 'NO' & season < 2002 ~ alt_logo_url('NO00'),
+        team == 'NO' & season < 2012 ~ alt_logo_url('NO02'),
+        team == 'NO' & season < 2017 ~ alt_logo_url('NO12'),
+        team == 'NYG' & season < 2000 ~ alt_logo_url('NYG76'),
+        team == 'NYG' ~ alt_logo_url('NYG'),
+        team == 'NYJ' & season < 1998 ~ alt_logo_url('NYJ78'),
+        team == 'NYJ' & season < 2019 ~ alt_logo_url('NYJ98'),
+        team == 'PHI' & season < 1996 ~ alt_logo_url('PHI87'),
+        team == 'PIT' & season < 2002 ~ alt_logo_url('PIT69'),
+        team == 'PIT' ~ alt_logo_url('PIT'),
+        team == 'SF' & season < 1996 ~ alt_logo_url('SF68'),
+        team == 'SEA' & season < 2002 ~ alt_logo_url('SEA76'),
+        team == 'SEA' & season < 2012 ~ alt_logo_url('SEA02'),
+        team == 'TB' & season < 1997 ~ alt_logo_url('TB76'),
+        team == 'TB' & season < 2014 ~ alt_logo_url('TB97'),
+        team == 'TB' & season < 2020 ~ alt_logo_url('TB14'),
+        team == 'TEN' & season < 1999 ~ alt_logo_url('TEN97'),
+        team == 'HSO' ~  alt_logo_url('TEN97'),
+        team == 'KC' ~ alt_logo_url('KC'),
+        TRUE ~ ESPN_logo_url(team)
+      )
+    ) %>% 
+    return
+}
+	      
 #used for creating game_id below
 leading_zero <- function(x, max_len) sapply(x, function(y) ifelse(nchar(y) >= max_len, y, paste0(rep('0', max_len - nchar(y)), y)))
 
