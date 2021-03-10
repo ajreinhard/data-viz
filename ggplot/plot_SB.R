@@ -614,7 +614,7 @@ hist_color_map <- function (df) {
         team == 'DEN' & season < 1997 ~ 'DEN68',
         team == 'DET' & season < 2009 ~ 'DET70',
         team == 'DET' & season < 2017 ~ 'DET09',
-        team %in% C('IND','BLC') & season < 2002 ~ 'IND84',
+        team %in% c('IND','BLC') & season < 2002 ~ 'IND84',
         team == 'IND' & season < 2020 ~ 'IND19',
         team %in% c('SD','LAC') & season < 1974 ~ 'SD61',
         team %in% c('SD','LAC') & season < 1988 ~ 'SD74',
