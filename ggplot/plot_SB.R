@@ -512,7 +512,7 @@ fran2team <- function (df) {
           tm == 'ARI' & season < 1994 ~ 'PHX',
           tm == 'LV' & season < 1995 ~ 'LRD',
           tm == 'TEN' & season < 1997 ~ 'HSO',
-          tm == 'LA' & season < 2016 ~ 'STL',
+          tm == 'LA' & season < 2016 & season >= 1995 ~ 'STL',
           tm == 'LAC' & season < 2017 ~ 'SD',
           tm == 'LV' & season < 2020 ~ 'OAK',
           TRUE ~ tm
