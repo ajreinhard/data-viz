@@ -16,8 +16,10 @@ library(magrittr)
 library(tidyverse)
 library(gganimate)
 library(gt)
+library(gtExtra)
 library(ggridges)
 library(nflfastR)
+library(nflreadr)
 library(emphatic)
 
 # decide what font I should use based on what is available on computer
@@ -234,6 +236,10 @@ properLims <- function(vec) {
 plus_lab = function(x, accuracy = NULL, suffix = '') paste0(ifelse(x>0,'+',''),number(x, accuracy = accuracy, suffix = suffix, scale = ifelse(suffix == '%', 100, 1)))
 plus_lab_format <- function (accuracy = NULL, suffix = '') function(x) plus_lab(x, accuracy = accuracy, suffix = suffix)
 
+# rsq function
+rsq <- function (x, y) cor(x, y) ^ 2
+
+	
 full_alpha_hex = function(color, alpha) {
   old_rgb <- col2rgb(color)
   new_rgb <- (255 - (255 - old_rgb) * alpha) / 255
