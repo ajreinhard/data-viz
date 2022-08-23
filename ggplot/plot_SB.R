@@ -729,7 +729,7 @@ lapply(1:32, function(i) {
       jsonlite::fromJSON() |>  
       extract2('team_players') |>  
       as_tibble() |>  
-      return()
+      (function(x) return(x))()
   }) %>%
   bind_rows() |>  
   type.convert(as.is = T) |> 
