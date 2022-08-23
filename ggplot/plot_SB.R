@@ -203,24 +203,38 @@ table_theme_SB <- function (data, width = 800) {
 
 
 # add logo to table and space around outside of image
-brand_table <- function(gt_table, file, data_home, base_size = base_size, t = 3, r = 6, b = 8, l = 6) {
+#brand_table <- function(gt_table, file, data_home, base_size = base_size, t = 3, r = 6, b = 8, l = 6) {
+#  gt_table %>% gtsave(file)
+#  
+#  img <- png::readPNG(file)
+#  img <- img[11:(nrow(img)-10),11:(ncol(img)-10),]
+#  
+#  p <- ggplot(iris, aes(Species, Sepal.Length))+
+#    annotation_custom(rasterGrob(img, width = unit(1,"npc"), height = unit(1,"npc")), -Inf, Inf, -Inf, Inf) +
+#    theme_void() +
+#    theme(
+#      plot.margin = unit(c(t,r,b,l),units = 'points'),
+#      plot.background = element_rect(fill = 'grey95', color = NA)
+#    )
+#  
+#  brand_plot(p, asp = ncol(img)/nrow(img), save_name = file, data_home = data_home, base_size = base_size)
+#}	
+
+# better brand table function
+brand_table <- function(gt_table, file, data_home, base_size = base_size) {
   gt_table %>% gtsave(file)
   
   img <- png::readPNG(file)
   img <- img[11:(nrow(img)-10),11:(ncol(img)-10),]
   
   p <- ggplot(iris, aes(Species, Sepal.Length))+
-    annotation_custom(rasterGrob(img, width = unit(1,"npc"), height = unit(1,"npc")), -Inf, Inf, -Inf, Inf) +
+    annotation_custom(rasterGrob(img, width = unit(0.965, 'npc'), height = unit(0.965, 'npc'), y = unit(0.995, 'npc'), vjust = 1), -Inf, Inf, -Inf, Inf) +
     theme_void() +
-    theme(
-      plot.margin = unit(c(t,r,b,l),units = 'points'),
-      plot.background = element_rect(fill = 'grey95', color = NA)
-    )
+    theme(plot.background = element_rect(fill = 'grey95', color = NA))
   
-  brand_plot(p, asp = ncol(img)/nrow(img), save_name = file, data_home = data_home, base_size = base_size)
-}	
-		     
-				     
+  brand_plot(p, asp = ncol(img)/nrow(img) * 0.965, save_name = file, data_home = data_home, base_size = base_size)
+}
+			     
 				     
 # function to set rounded plot limits
 properLims <- function(vec) {
@@ -705,6 +719,23 @@ get_538elo <- function() {
     return
 }
 
+# get active roster from PFF
+pff_active_rosters <- function() {
+
+lapply(1:32, function(i) {
+  Sys.sleep(2)
+  
+    paste0('https://www.pff.com/api/teams/',i,'/roster') |>  
+      jsonlite::fromJSON() |>  
+      extract2('team_players') |>  
+      as_tibble() |>  
+      return()
+  }) %>%
+  bind_rows() |>  
+  type.convert(as.is = T) |> 
+  mutate(team = team_abbr_mapping[paste0(team_name)])
+
+}
 	      				     
 color_SB <- c("#ff7f00", "#9932cc", "#8cff72", "#00008b", "#51dbd8", "#674b00", "#ff66cf", "#8f8f8f", "#ff0000", "#e1ed00", "#0b5209", "#636363")
 
