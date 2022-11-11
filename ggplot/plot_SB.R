@@ -702,11 +702,11 @@ get_538elo <- function() {
       ),
       game_id = paste(season, leading_zero(week, 2), away_team, home_team, sep = '_'),
       game_type = case_when(
+	is.na(game_type) ~ 'REG',
         game_type == 's' ~ 'SB',
         game_type == 'c' ~ 'CON',
         game_type == 'd' ~ 'DIV',
-        game_type == 'w' ~ 'WC',
-        game_type == '' ~ 'REG'
+        game_type == 'w' ~ 'WC'
       ),
       location = ifelse(location == 0, 'Home', 'Neutral'),
       result = home_score - away_score,
