@@ -677,7 +677,7 @@ leading_zero <- function(x, max_len) sapply(x, function(y) ifelse(nchar(y) >= ma
 
 #get 538 elo data frame
 get_538elo <- function() {
-  read.csv('https://projects.fivethirtyeight.com/nfl-api/nfl_elo.csv', stringsAsFactors = F) %>% 
+  read_csv('https://projects.fivethirtyeight.com/nfl-api/nfl_elo.csv') %>% 
     rename(gameday = date, game_type = playoff, location = neutral) %>% 
     rename_with(function(x) paste0('home_', gsub('1','', x)), contains('1')) %>% 
     rename_with(function(x) paste0('away_', gsub('2','', x)), contains('2')) %>% 
