@@ -28,7 +28,7 @@ wordmark_url = function(x) ifelse(is.na(x),NA,paste0('https://raw.githubusercont
 helmet_url = function(x) ifelse(is.na(x),NA,paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/helmet_left/',x,'.png'))
 ESPN_logo_url <- function(x) ifelse(is.na(x),NA,paste0('https://a.espncdn.com/i/teamlogos/nfl/500/',x,'.png'))
 alt_logo_url <- function(x) ifelse(is.na(x),NA,paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/alt-logo/',x,'.png'))
-helm2020 <- function(team, side) paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/2020_helm/',team,'_',side,'.png')
+helm2023 <- function(team, side) paste0('https://raw.githubusercontent.com/ajreinhard/data-viz/master/2023_helm/',team,'_',side,'.png')
 
 # my prefered team order for facets
 .tm_div_order <- c('BUF', 'MIA', 'NE', 'NYJ', 'BAL', 'CIN', 'CLE', 'PIT', 'HOU', 'IND', 'JAX', 'TEN', 'DEN', 'KC', 'LAC', 'LV', 'DAL', 'NYG', 'PHI', 'WAS', 'CHI', 'DET', 'GB', 'MIN', 'ATL', 'CAR', 'NO', 'TB', 'ARI', 'LA', 'SEA', 'SF')
